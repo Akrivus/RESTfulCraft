@@ -25,8 +25,8 @@ import spark.Spark;
 
 @EventBusSubscriber
 public class Server {
-	static { Spark.port(RESTfulCraft.Config.PORT); }
-	public static int port = RESTfulCraft.Config.PORT;
+	static { Spark.port(RESTfulCraft.port); }
+	public static int port = RESTfulCraft.port;
 	public static World world;
 	public static BlockPos pos;
 	public static BlockState blockState;
@@ -43,7 +43,7 @@ public class Server {
 			Spark.notFound((req, res) -> { return error("Route not found."); });
 			Spark.before("/*", (req, res) -> {
 				res.header("Content-Type", "application/json");
-				if (req.headers("Authentication").isEmpty() || req.headers("Authentication").equals(RESTfulCraft.Config.AUTH_KEY)) {
+				if (req.headers("Authentication").isEmpty() || req.headers("Authentication").equals(RESTfulCraft.authKey)) {
 					RESTfulCraft.LOGGER.info("{} - {} {}", req.ip(), req.requestMethod(), req.uri());
 				} else {
 					Spark.halt(401, Server.error("Authentication key invalid."));
@@ -72,13 +72,13 @@ public class Server {
 					}
 				});
 				Spark.put("/:x/:y/:z", (req, res) -> {
-					JsonObject json = RESTfulCraft.JsonHelper.parse(req.body());
+					JsonObject json = CreateJSON.fromString(req.body());
 					BlockState state = getBlockFromName(json.get("id")).getDefaultState();
 					if (json.get("properties") != null) {
 						StateContainer<Block, BlockState> container = state.getBlock().getStateContainer();
 						JsonObject properties = (JsonObject) json.get("properties");
 						for (Entry<String, JsonElement> entry : properties.entrySet()) {
-							IProperty<?> property = container.getProperty(RESTfulCraft.JsonHelper.format(entry.getKey()));
+							IProperty<?> property = container.getProperty(CreateJSON.withCamelCase(entry.getKey()));
 							if (property == null) {
 								Spark.halt(400, Server.error("Invalid property '%s'.", entry.getKey()));
 							} else {
@@ -86,7 +86,7 @@ public class Server {
 							}
 						}
 					}
-					return RESTfulCraft.JsonHelper.stringify(RESTfulCraft.JsonHelper.map("placed", world.setBlockState(pos, state)));
+					return CreateJSON.fromMap("placed", world.setBlockState(pos, state));
 				});
 				Spark.get("/:x/:y/:z", (req, res) -> {
 					JsonObject json = new JsonObject(), properties = new JsonObject();
@@ -94,11 +94,11 @@ public class Server {
 			   		ImmutableMap<IProperty<?>, Comparable<?>> map = blockState.getValues();
 			   		for (Entry<IProperty<?>, Comparable<?>> entry : map.entrySet()) {
 			   			IProperty<?> property = entry.getKey();
-			   			properties.add(property.getName(), RESTfulCraft.JsonHelper.objectify(blockState.get(property)));
+			   			properties.add(property.getName(), CreateJSON.fromObject(blockState.get(property)));
 			   		}
 			   		json.add("properties", properties);
 			   		if (tileEntity != null) {
-			   			json.add("tileEntity", RESTfulCraft.JsonHelper.toJson(tileEntity.serializeNBT()));
+			   			json.add("tileEntity", CreateJSON.fromNBT(tileEntity.serializeNBT()));
 			   		} else {
 			   			json.add("tileEntity", null);
 			   		}
@@ -108,7 +108,7 @@ public class Server {
 					if (world.isAirBlock(pos)) {
 						return Spark.halt(409, Server.error("Target block position unoccupied."));
 					} else {
-						return RESTfulCraft.JsonHelper.stringify(RESTfulCraft.JsonHelper.map("destroyed", world.destroyBlock(pos, true)));
+						return CreateJSON.fromMap("destroyed", world.destroyBlock(pos, true));
 					}
 				});
 			});
@@ -124,7 +124,7 @@ public class Server {
 		return ONLINE;
 	}
 	public static String error(String message, Object...objects) {
-		return RESTfulCraft.JsonHelper.post("error", String.format(message, objects));
+		return CreateJSON.fromMap("error", String.format(message, objects));
 	}
 	private static Block getBlockFromName(JsonElement name) {
 		return Registry.BLOCK.getOrDefault(new ResourceLocation(name.getAsString()));
