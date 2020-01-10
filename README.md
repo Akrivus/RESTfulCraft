@@ -4,7 +4,7 @@ Introducing software development concepts to Minecraft by turning worlds into a 
 
 ## Configuration
 There are two configuration settings for RESTfulCraft.
-- `authKey` is the only acceptable value of the `Authentication` header when you connect. It is blank by default.
+- `authKey` is the only acceptable value of the `Authorization` header when you connect. It is blank by default.
 - `port` is the server API port. By default, it is `56552`.
 
 ## Documentation
