@@ -55,7 +55,7 @@ public class BlockAPI {
 	public static final Route UPDATE = (req, res) -> {
 		Query query = Query.get(req);
 		if (query.json != null) {
-			BlockState state = setStateWithJSON(query.blockState.getBlock(), query.json);
+			BlockState state = setStateWithJSON(query.blockState.getBlock(), query.blockState, query.json);
 			return CreateJSON.fromMap("updated", query.world.setBlockState(query.pos, state));
 		} else {
 			return Spark.halt(406, CreateJSON.fromMap("error", "Request body missing."));
@@ -103,13 +103,15 @@ public class BlockAPI {
 		return Registry.BLOCK.getKey(block).toString();
 	}
 	private static BlockState setStateWithJSON(Block block, BlockState state, JsonObject json) {
-		StateContainer<Block, BlockState> container = block.getStateContainer();
-		for (Entry<String, JsonElement> entry : json.entrySet()) {
-			IProperty<?> property = container.getProperty(CreateJSON.withCamelCase(entry.getKey()));
-			if (property == null) {
-				throw new IllegalArgumentException(String.format("Invalid property '%s'.", entry.getKey()));
-			} else {
-				state = mutate(state, property, entry.getValue());
+		if (json != null) {
+			StateContainer<Block, BlockState> container = block.getStateContainer();
+			for (Entry<String, JsonElement> entry : json.entrySet()) {
+				IProperty<?> property = container.getProperty(CreateJSON.withCamelCase(entry.getKey()));
+				if (property == null) {
+					throw new IllegalArgumentException(String.format("Invalid property '%s'.", entry.getKey()));
+				} else {
+					state = mutate(state, property, entry.getValue());
+				}
 			}
 		}
 		return state;
