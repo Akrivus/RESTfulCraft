@@ -4,7 +4,7 @@ issueTrackerURL="https://github.com/Akrivus/RESTfulCraft/issues"
 
 [[mods]]
 modId="restfulcraft"
-version="20.1.8"
+version="20.1.10"
 displayName="RESTfulCraft"
 displayURL="https://github.com/Akrivus/RESTfulCraft"
 logoFile="/assets/restfulcraft/logo.png"
