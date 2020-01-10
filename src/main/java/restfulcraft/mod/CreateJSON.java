@@ -19,15 +19,39 @@ import net.minecraft.nbt.NumberNBT;
 
 public class CreateJSON {
 	private static final JsonParser PARSER = new JsonParser();
+	
+	/**
+	 * Parses the provided <code>String</code> into a <code>JsonObject.</code>
+	 * @param input
+	 * @return
+	 */
 	public static JsonObject fromString(String input) {
 		return (JsonObject) PARSER.parse(input);
 	}
-	public static String toString(Object object) {
-		return RESTfulCraft.GSON.toJson(object);
+	/**
+	 * Serializes the provided <code>Object</code> into a JSON string.
+	 * @param input
+	 * @return
+	 */
+	public static String toString(Object input) {
+		return RESTfulCraft.GSON.toJson(input);
 	}
-	public static JsonElement fromObject(Object object) {
-		return RESTfulCraft.GSON.toJsonTree(object);
+	/**
+	 * Serializes the provided <code>Object</code> into JSON.
+	 * @param input
+	 * @return
+	 */
+	public static JsonElement fromObject(Object input) {
+		return RESTfulCraft.GSON.toJsonTree(input);
 	}
+	/**
+	 * Converts an array of objects into a <code>Map</code>, and serializes it into JSON.
+	 * Used as a convenience method for generating basic status responses.
+	 * @param key
+	 * @param value
+	 * @param pairs
+	 * @return
+	 */
 	public static String fromMap(String key, Object value, Object...pairs) {
 		HashMap<String, Object> map = new HashMap<String, Object>();
 		map.put(key, value);
@@ -36,24 +60,30 @@ public class CreateJSON {
 		}
 		return toString(map);
 	}
-	public static JsonElement fromNBT(INBT object) {
-		switch (INBT.NBT_TYPES[object.getId()]) {
+	/**
+	 * Converts NBT objects into proper JSON. <code>CompoundNBT#toString()</code> does not
+	 * produce proper JSON, so we needed to make our own helper method for it.
+	 * @param input
+	 * @return
+	 */
+	public static JsonElement fromNBT(INBT input) {
+		switch (INBT.NBT_TYPES[input.getId()]) {
 		case "SHORT": case "INT": case "LONG": case "BYTE": case "FLOAT": case "DOUBLE":
-			NumberNBT num = (NumberNBT) object;
-			if (object instanceof FloatNBT && object instanceof DoubleNBT) {
+			NumberNBT num = (NumberNBT) input;
+			if (input instanceof FloatNBT && input instanceof DoubleNBT) {
 				return new JsonPrimitive(num.getFloat());
 			} else {
 				return new JsonPrimitive(num.getInt());
 			}
 		case "BYTE[]": case "INT[]": case "LONG[]": case "LIST":
-			CollectionNBT<?> col = (CollectionNBT<?>) object;
+			CollectionNBT<?> col = (CollectionNBT<?>) input;
 			JsonArray arr = new JsonArray();
 			for (int i = 0; i < col.size(); ++i) {
 				arr.add(fromNBT(col.get(i)));
 			}
 			return arr;
 		case "COMPOUND":
-			CompoundNBT com = (CompoundNBT) object;
+			CompoundNBT com = (CompoundNBT) input;
 			JsonObject obj = new JsonObject();
 			for (String key : com.keySet()) {
 				if (key.endsWith("Least") || key.endsWith("Most")) {
@@ -66,10 +96,16 @@ public class CreateJSON {
 			}
 			return obj;
 		default:
-			return new JsonPrimitive(object.getString());
+			return new JsonPrimitive(input.getString());
 		}
 	}
-	public static String withCamelCase(String key) {
-		return CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, key);
+	/**
+	 * Converts <code>PascalCase</code> into <code>camelCase</code>  for standardizing the atypical
+	 * case format that NBT uses in Minecraft's mobile and tile entities.
+	 * @param input
+	 * @return
+	 */
+	public static String withCamelCase(String input) {
+		return CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, input);
 	}
 }
