@@ -22,7 +22,6 @@ import net.minecraftforge.fml.event.server.FMLServerStoppedEvent;
 @Mod("restfulcraft")
 public class RESTfulCraft {
     public static final Logger LOGGER = LogManager.getLogger();
-    public static final Gson GSON = new Gson();
     public static Server server;
 	public static String authKey = "";
 	public static int port = 56552;

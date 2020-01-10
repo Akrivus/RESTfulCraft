@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.UUID;
 
 import com.google.common.base.CaseFormat;
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -19,6 +20,7 @@ import net.minecraft.nbt.NumberNBT;
 
 public class CreateJSON {
 	private static final JsonParser PARSER = new JsonParser();
+    private static final Gson GSON = new Gson();
 	
 	/**
 	 * Parses the provided <code>String</code> into a <code>JsonObject.</code>
@@ -34,7 +36,7 @@ public class CreateJSON {
 	 * @return
 	 */
 	public static String toString(Object input) {
-		return RESTfulCraft.GSON.toJson(input);
+		return GSON.toJson(input);
 	}
 	/**
 	 * Serializes the provided <code>Object</code> into JSON.
@@ -42,7 +44,7 @@ public class CreateJSON {
 	 * @return
 	 */
 	public static JsonElement fromObject(Object input) {
-		return RESTfulCraft.GSON.toJsonTree(input);
+		return GSON.toJsonTree(input);
 	}
 	/**
 	 * Converts an array of objects into a <code>Map</code>, and serializes it into JSON.
