@@ -71,7 +71,7 @@ public class BlockAPI {
    		ImmutableMap<IProperty<?>, Comparable<?>> map = query.blockState.getValues();
    		for (Entry<IProperty<?>, Comparable<?>> entry : map.entrySet()) {
    			IProperty<?> property = entry.getKey();
-   			properties.add(property.getName(), CreateJSON.fromObject(query.blockState.get(property)));
+   			properties.add(property.getName(), CreateJSON.fromObject(query.blockState.get(property).toString()));
    		}
    		json.add("properties", properties);
    		if (query.tileEntity != null) {
