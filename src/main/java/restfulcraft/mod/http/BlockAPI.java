@@ -9,6 +9,7 @@ import com.google.gson.JsonObject;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.state.IProperty;
 import net.minecraft.state.IStateHolder;
 import net.minecraft.state.StateContainer;
@@ -26,12 +27,26 @@ public class BlockAPI {
 	 */
 	public static final Route PLACE = (req, res) -> {
 		Query query = Query.get(req);
-		if (query.json != null && query.world.isAirBlock(query.pos)) {
-			Block block = getBlock(query.json.get("id").getAsString());
-			BlockState state = setStateWithJSON(block, query.json.getAsJsonObject("properties"));
-			return CreateJSON.fromMap("placed", query.world.setBlockState(query.pos, state));
-		} else if (query.json != null) {
-			return Spark.halt(409, CreateJSON.fromMap("error", "Block occupied."));
+		if (query.json != null) {
+			if (query.world.isAirBlock(query.pos)) {
+				if (query.json.has("tileEntity")) {
+					return Spark.halt(405, CreateJSON.fromMap("error", "Tile entities are read-only."));
+				} else if (query.json.has("entities")) {
+					return Spark.halt(405, CreateJSON.fromMap("error", "Entities are read-only."));
+				} else if (query.json.has("id")) {
+					try {
+						Block block = getBlock(query.json.get("id").getAsString());
+						BlockState state = setStateWithJSON(block, query.json.getAsJsonObject("properties"));
+						return CreateJSON.fromMap("placed", query.world.setBlockState(query.pos, state));
+					} catch (IllegalArgumentException e) {
+						return Spark.halt(422, CreateJSON.fromMap("error", e.getMessage()));
+					}
+				} else {
+					return Spark.halt(405, CreateJSON.fromMap("error", "Block ID missing."));
+				}
+			} else {
+				return Spark.halt(405, CreateJSON.fromMap("error", "Block occupied."));
+			}
 		} else {
 			return Spark.halt(406, CreateJSON.fromMap("error", "Request body missing."));
 		}
@@ -42,9 +57,21 @@ public class BlockAPI {
 	public static final Route REPLACE = (req, res) -> {
 		Query query = Query.get(req);
 		if (query.json != null) {
-			Block block = getBlock(query.json.get("id").getAsString());
-			BlockState state = setStateWithJSON(block, query.json.getAsJsonObject("properties"));
-			return CreateJSON.fromMap("replaced", query.world.setBlockState(query.pos, state));
+			if (query.json.has("tileEntity")) {
+				return Spark.halt(405, CreateJSON.fromMap("error", "Tile entities are read-only."));
+			} else if (query.json.has("entities")) {
+				return Spark.halt(405, CreateJSON.fromMap("error", "Entities are read-only."));
+			} else if (query.json.has("id")) {
+				try {
+					Block block = getBlock(query.json.get("id").getAsString());
+					BlockState state = setStateWithJSON(block, query.json.getAsJsonObject("properties"));
+					return CreateJSON.fromMap("replaced", query.world.setBlockState(query.pos, state));
+				} catch (IllegalArgumentException e) {
+					return Spark.halt(422, CreateJSON.fromMap("error", e.getMessage()));
+				}
+			} else {
+				return Spark.halt(405, CreateJSON.fromMap("error", "Block ID missing."));
+			}
 		} else {
 			return Spark.halt(406, CreateJSON.fromMap("error", "Request body missing."));
 		}
@@ -55,8 +82,12 @@ public class BlockAPI {
 	public static final Route UPDATE = (req, res) -> {
 		Query query = Query.get(req);
 		if (query.json != null) {
-			BlockState state = setStateWithJSON(query.blockState.getBlock(), query.blockState, query.json);
-			return CreateJSON.fromMap("updated", query.world.setBlockState(query.pos, state));
+			try {
+				BlockState state = setStateWithJSON(query.blockState.getBlock(), query.blockState, query.json);
+				return CreateJSON.fromMap("updated", query.world.setBlockState(query.pos, state));
+			} catch (IllegalArgumentException e) {
+				return Spark.halt(422, CreateJSON.fromMap("error", e.getMessage()));
+			}
 		} else {
 			return Spark.halt(406, CreateJSON.fromMap("error", "Request body missing."));
 		}
