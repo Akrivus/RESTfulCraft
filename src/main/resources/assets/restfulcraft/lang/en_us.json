@@ -1,0 +1,7 @@
+{
+    "restfulcraft.commands.server.online": "<RESTfulCraft> §aOnline§f @ Port %d",
+    "restfulcraft.commands.server.offline": "<RESTfulCraft> §cOffline",
+    "restfulcraft.commands.route.success": "<RESTfulCraft> §eRouted§f @ §7[%s]",
+    "restfulcraft.config.authKey": "Authentication key:",
+    "restfulcraft.config.port": "Server port:"
+}
