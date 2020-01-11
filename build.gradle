@@ -55,11 +55,15 @@ minecraft {
         }
     }
 }
+repositories { mavenCentral() }
+configurations { embeds }
 dependencies {
     minecraft 'net.minecraftforge:forge:1.14.4-28.1.0'
+	embeds 'com.sparkjava:spark-core:2.8.0'
 	compile 'com.sparkjava:spark-core:2.8.0'
 }
 jar {
+	from configurations.embeds.collect { it.isDirectory() ? it : zipTree(it) }
     manifest {
         attributes([
             "Implementation-Title": project.name, "Implementation-Vendor": "Akrivus",
