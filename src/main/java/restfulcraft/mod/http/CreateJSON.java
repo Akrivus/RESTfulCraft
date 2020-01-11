@@ -104,8 +104,8 @@ public class CreateJSON {
 		}
 	}
 	/**
-	 * Converts <code>PascalCase</code> into <code>camelCase</code>  for standardizing the atypical
-	 * case format that NBT uses in Minecraft's mobile and tile entities.
+	 * Converts <code>PascalCase</code> into <code>camelCase</code> or <code>snake_case</code> for
+	 * standardizing the atypical case format that NBT uses in Minecraft's mobile and tile entities.
 	 * @param input
 	 * @return
 	 */

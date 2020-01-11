@@ -24,7 +24,7 @@ import restfulcraft.mod.http.CreateJSON;
 import spark.Request;
 import spark.Spark;
 
-public class BlockConnector {
+public class BlockConnection {
 	public World world;
 	public JsonObject json;
 	public BlockPos pos;
@@ -32,7 +32,7 @@ public class BlockConnector {
 	public TileEntity tileEntity;
 	public ListNBT entities;
 	
-	public BlockConnector(Request req) {
+	public BlockConnection(Request req) {
 		this.world = (World) req.attribute("world");
 		this.json = (JsonObject) req.attribute("json");
 		this.pos = (BlockPos) req.attribute("pos");
