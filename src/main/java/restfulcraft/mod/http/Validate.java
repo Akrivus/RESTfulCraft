@@ -33,7 +33,7 @@ public class Validate {
 			Spark.halt(404, CreateJSON.fromMap("error", String.format("Dimension '%s' not found.", name)));
 		} else {
 			World world = RESTfulCraft.server.getWorld(dimension);
-			if (world == null) {
+			if (world == null) { // you will get this if you call an unoccupied dimension
 				Spark.halt(503, CreateJSON.fromMap("error", "Dimension found but not currently loadable."));
 			} else {
 				req.attribute("world", world);

@@ -28,12 +28,12 @@ public class Server {
 			Spark.notFound((req, res) -> { return CreateJSON.fromMap("error", "Route not found."); });
 			Spark.before(Validate.AUTHORIZATION, Validate.JSON);
 			Spark.path("/api/v1/:mod/:dim", () -> {
-				Spark.before(BlockRouter.QUERY_URL, Validate.DIMENSION, Validate.BLOCK_POS);
-				Spark.post(BlockRouter.QUERY_URL, BlockRouter.POST);
-				Spark.put(BlockRouter.QUERY_URL, BlockRouter.PUT);
-				Spark.patch(BlockRouter.QUERY_URL, BlockRouter.PATCH);
-				Spark.delete(BlockRouter.QUERY_URL, BlockRouter.DELETE);
-				Spark.get(BlockRouter.QUERY_URL, BlockRouter.GET);
+				Spark.before("/:x/:y/:z", Validate.DIMENSION, Validate.BLOCK_POS);
+				Spark.get("/:x/:y/:z", BlockRouter.GET);
+				Spark.put("/:x/:y/:z", BlockRouter.PUT);
+				Spark.post("/:x/:y/:z", BlockRouter.POST);
+				Spark.patch("/:x/:y/:z", BlockRouter.PATCH);
+				Spark.delete("/:x/:y/:z", BlockRouter.DELETE);
 			});
 			Spark.afterAfter((req, res) -> {
 				RESTfulCraft.LOGGER.info("{} - {} {} {}", req.ip(), res.status(), req.requestMethod(), req.uri());

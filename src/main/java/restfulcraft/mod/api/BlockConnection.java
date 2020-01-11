@@ -1,22 +1,17 @@
 package restfulcraft.mod.api;
 
-import java.util.List;
-import java.util.Optional;
 import java.util.Map.Entry;
+import java.util.Optional;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.nbt.ListNBT;
 import net.minecraft.state.IProperty;
 import net.minecraft.state.IStateHolder;
 import net.minecraft.state.StateContainer;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
@@ -25,29 +20,34 @@ import spark.Request;
 import spark.Spark;
 
 public class BlockConnection {
-	public World world;
+	/**
+	 * The world the connection originates from.
+	 */
+	public final World world;
+	/**
+	 * The parsed JSON body of the request, unless null.
+	 */
 	public JsonObject json;
+	/**
+	 * The block position extracted from the URL.
+	 */
 	public BlockPos pos;
-	public BlockState blockState;
-	public TileEntity tileEntity;
-	public ListNBT entities;
 	
 	public BlockConnection(Request req) {
 		this.world = (World) req.attribute("world");
 		this.json = (JsonObject) req.attribute("json");
 		this.pos = (BlockPos) req.attribute("pos");
-		this.blockState = this.world.getBlockState(this.pos);
-		this.tileEntity = this.world.getChunkAt(this.pos).getTileEntity(this.pos);
-		this.entities = new ListNBT();
-		List<Entity> entities = this.world.getEntitiesWithinAABB(Entity.class, new AxisAlignedBB(this.pos, this.pos.add(1, 2, 1)));
-		for (Entity entity : entities) {
-			this.entities.add(entity.serializeNBT());
-		}
 	}
+	/**
+	 * Helper method for POST and PUT requests, serializes request JSON into a block state.
+	 * @param replacing
+	 * @return
+	 */
+	@SuppressWarnings("deprecation")
 	public boolean placeBlock(boolean replacing) {
 		if (this.json != null) {
 			try {
-				Block block = getBlock(this.json.get("id").getAsString());
+				Block block = Registry.BLOCK.getOrDefault(new ResourceLocation(this.json.get("id").getAsString()));
 				if (replacing || this.world.isAirBlock(this.pos)) {
 					this.json = this.json.getAsJsonObject("properties");
 					return this.updateBlock(block.getDefaultState());
@@ -64,20 +64,15 @@ public class BlockConnection {
 		}
 		return false;
 	}
+	/**
+	 * Helper method for POST and PUT methods, serializes request JSON into individual block state properties.
+	 * @param state
+	 * @return
+	 */
 	public boolean updateBlock(BlockState state) {
-		state = this.setStateWithJSON(state.getBlock(), state, this.json);
-		return this.world.setBlockState(this.pos, state);
-	}
-	public boolean updateBlock() {
-		return this.updateBlock(this.world.getBlockState(this.pos));
-	}
-	public boolean breakBlock() {
-		return this.world.destroyBlock(this.pos, true);
-	}
-	private BlockState setStateWithJSON(Block block, BlockState state, JsonObject json) {
-		if (json != null) {
-			StateContainer<Block, BlockState> container = block.getStateContainer();
-			for (Entry<String, JsonElement> entry : json.entrySet()) {
+		if (this.json != null) {
+			StateContainer<Block, BlockState> container = state.getBlock().getStateContainer();
+			for (Entry<String, JsonElement> entry : this.json.entrySet()) {
 				IProperty<?> property = container.getProperty(CreateJSON.reformat(entry.getKey()));
 				if (property == null) {
 					throw new IllegalArgumentException(String.format("Invalid property '%s'.", entry.getKey()));
@@ -86,8 +81,24 @@ public class BlockConnection {
 				}
 			}
 		}
-		return state;
+		return this.world.setBlockState(this.pos, state);
 	}
+	/**
+	 * Helper method for PATCH methods, serializes request JSON into individual block state properties.
+	 * @return
+	 */
+	public boolean updateBlock() {
+		return this.updateBlock(this.world.getBlockState(this.pos));
+	}
+	/**
+	 * Private method used for the generic acrobatics performance that is returning the value of a block state property.
+	 * @param <S>
+	 * @param <T>
+	 * @param state
+	 * @param property
+	 * @param json
+	 * @return
+	 */
 	private <S extends IStateHolder<S>, T extends Comparable<T>> S mutate(S state, IProperty<T> property, JsonElement json) {
 		Optional<T> value = property.parseValue(json.getAsString());
 		if (value.isPresent()) {
@@ -95,13 +106,5 @@ public class BlockConnection {
 		} else {
 			return state;
 		}
-	}
-	@SuppressWarnings("deprecation")
-	public Block getBlock(String name) {
-		return Registry.BLOCK.getOrDefault(new ResourceLocation(name));
-	}
-	@SuppressWarnings("deprecation")
-	public String getBlockName(Block block) {
-		return Registry.BLOCK.getKey(block).toString();
 	}
 }

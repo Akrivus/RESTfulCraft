@@ -90,6 +90,7 @@ public class CreateJSON {
 			CompoundNBT com = (CompoundNBT) input;
 			JsonObject obj = new JsonObject();
 			for (String key : com.keySet()) {
+				// uuids are stored in 2 values, so i'm combining them
 				if (key.endsWith("Least") || key.endsWith("Most")) {
 					String uuidKey = key.replaceAll("Least|Most$", "");
 					UUID uuid = com.getUniqueId(uuidKey);
