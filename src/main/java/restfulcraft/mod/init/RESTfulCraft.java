@@ -22,6 +22,7 @@ public class RESTfulCraft {
     public static final Logger LOGGER = LogManager.getLogger();
     public static Server server;
 	public static String authKey = "";
+	public static boolean formatSnakeCase = false;
 	public static int port = 56552;
 
     public RESTfulCraft() {
@@ -51,17 +52,20 @@ public class RESTfulCraft {
     	public static final Config INSTANCE = PAIR.getLeft();
     	
     	public final ForgeConfigSpec.ConfigValue<String> authKey;
+    	public final ForgeConfigSpec.BooleanValue formatSnakeCase;
     	public final ForgeConfigSpec.IntValue port;
     	
     	public Config(ForgeConfigSpec.Builder builder) {
     		builder.push("server");
     		this.authKey = builder.translation("restfulcraft.config.authKey").define("authKey", "");
+    		this.formatSnakeCase = builder.translation("restfulcraft.config.formatSnakeCase").define("formatSnakeCase", false);
     		this.port = builder.translation("restfulcraft.config.port").defineInRange("port", 56552, 1, 65535);
     		builder.pop();
     	}
         @SubscribeEvent
         public static void onModConfig(ModConfigEvent e) {
         	RESTfulCraft.authKey = Config.INSTANCE.authKey.get();
+        	RESTfulCraft.formatSnakeCase = Config.INSTANCE.formatSnakeCase.get();
         	RESTfulCraft.port = Config.INSTANCE.port.get();
     	}
     }

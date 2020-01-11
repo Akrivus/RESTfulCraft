@@ -5,7 +5,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import restfulcraft.mod.api.BlockAPI;
+import restfulcraft.mod.api.BlockRouter;
 import restfulcraft.mod.http.CreateJSON;
 import restfulcraft.mod.http.Validate;
 import spark.Spark;
@@ -28,17 +28,12 @@ public class Server {
 			Spark.notFound((req, res) -> { return CreateJSON.fromMap("error", "Route not found."); });
 			Spark.before(Validate.AUTHORIZATION, Validate.JSON);
 			Spark.path("/api/v1/:mod/:dim", () -> {
-				Spark.path("/block", () -> {
-					Spark.before(BlockAPI.QUERY_URL, Validate.DIMENSION, Validate.BLOCK_POS);
-					Spark.post(BlockAPI.QUERY_URL, BlockAPI.POST);
-					Spark.put(BlockAPI.QUERY_URL, BlockAPI.PUT);
-					Spark.patch(BlockAPI.QUERY_URL, BlockAPI.PATCH);
-					Spark.delete(BlockAPI.QUERY_URL, BlockAPI.DELETE);
-					Spark.get(BlockAPI.QUERY_URL, BlockAPI.GET);
-				});
-				Spark.path("/command", () -> {
-					
-				});
+				Spark.before(BlockRouter.QUERY_URL, Validate.DIMENSION, Validate.BLOCK_POS);
+				Spark.post(BlockRouter.QUERY_URL, BlockRouter.POST);
+				Spark.put(BlockRouter.QUERY_URL, BlockRouter.PUT);
+				Spark.patch(BlockRouter.QUERY_URL, BlockRouter.PATCH);
+				Spark.delete(BlockRouter.QUERY_URL, BlockRouter.DELETE);
+				Spark.get(BlockRouter.QUERY_URL, BlockRouter.GET);
 			});
 			Spark.afterAfter((req, res) -> {
 				RESTfulCraft.LOGGER.info("{} - {} {} {}", req.ip(), res.status(), req.requestMethod(), req.uri());

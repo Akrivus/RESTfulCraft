@@ -18,6 +18,7 @@ import net.minecraft.nbt.DoubleNBT;
 import net.minecraft.nbt.FloatNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.NumberNBT;
+import restfulcraft.mod.init.RESTfulCraft;
 
 public class CreateJSON {
 	private static final JsonParser PARSER = new JsonParser();
@@ -92,9 +93,9 @@ public class CreateJSON {
 				if (key.endsWith("Least") || key.endsWith("Most")) {
 					String uuidKey = key.replaceAll("Least|Most$", "");
 					UUID uuid = com.getUniqueId(uuidKey);
-					obj.addProperty(withCamelCase(uuidKey), uuid.toString());
+					obj.addProperty(reformat(uuidKey), uuid.toString());
 				} else {
-					obj.add(withCamelCase(key), fromNBT(com.get(key)));
+					obj.add(reformat(key), fromNBT(com.get(key)));
 				}
 			}
 			return obj;
@@ -108,8 +109,14 @@ public class CreateJSON {
 	 * @param input
 	 * @return
 	 */
-	public static String withCamelCase(String input) {
-		return CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, input);
+	public static String reformat(String input) {
+		if (input.matches("^[A-Z]+$")) {
+			return input.toLowerCase();
+		} else if (RESTfulCraft.formatSnakeCase) {
+			return CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, input);
+		} else {
+			return CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, input);
+		}
 	}
 	/**
 	 * Checks if JSON is valid and returns <code>true</code> if so.
