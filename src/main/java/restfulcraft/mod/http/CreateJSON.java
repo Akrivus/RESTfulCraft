@@ -1,4 +1,4 @@
-package restfulcraft.mod;
+package restfulcraft.mod.http;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -8,6 +8,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 
@@ -21,7 +22,7 @@ import net.minecraft.nbt.NumberNBT;
 public class CreateJSON {
 	private static final JsonParser PARSER = new JsonParser();
     private static final Gson GSON = new Gson();
-	
+    
 	/**
 	 * Parses the provided <code>String</code> into a <code>JsonObject.</code>
 	 * @param input
@@ -109,5 +110,18 @@ public class CreateJSON {
 	 */
 	public static String withCamelCase(String input) {
 		return CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, input);
+	}
+	/**
+	 * Checks if JSON is valid and returns <code>true</code> if so.
+	 * @param input
+	 * @return
+	 */
+	public static boolean isValid(String input) {
+		try {
+			fromString(input);
+			return true;
+		} catch (JsonParseException e) {
+			return false;
+		}
 	}
 }

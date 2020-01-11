@@ -1,4 +1,4 @@
-package restfulcraft.mod;
+package restfulcraft.mod.init;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
