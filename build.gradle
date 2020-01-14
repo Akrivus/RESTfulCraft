@@ -6,15 +6,17 @@ buildscript {
     }
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
+        classpath group: 'com.github.jengelman.gradle.plugins', name: 'shadow', version: '4.0.4'
     }
 }
+apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
 version = new Date().format('1.1.yyMMdd')
 archivesBaseName = "RESTfulCraft"
-group = "dev.restfulcraft"
+group = "restfulcraft.mod"
 
 sourceCompatibility = compileJava.sourceCompatibility = '1.8'
 targetCompatibility = compileJava.targetCompatibility = '1.8'
@@ -56,14 +58,11 @@ minecraft {
     }
 }
 repositories { mavenCentral() }
-configurations { embeds }
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.14.4-28.1.0'
-	embeds 'com.sparkjava:spark-core:2.8.0'
-	compile 'com.sparkjava:spark-core:2.8.0'
+    minecraft 'net.minecraftforge:forge:1.14.4-28.1.114'
+    shadow 'com.sparkjava:spark-core:2.8.0'
 }
 jar {
-	from configurations.embeds.collect { it.isDirectory() ? it : zipTree(it) }
     manifest {
         attributes([
             "Implementation-Title": project.name, "Implementation-Vendor": "Akrivus",
@@ -74,8 +73,23 @@ jar {
         ])
     }
 }
+shadowJar {
+	configurations = [project.configurations.shadow]
+    relocate 'javax.servlet', 'restfulcraft.mod.javax.servlet'
+    relocate 'org.eclipse.jetty', 'restfulcraft.mod.jetty'
+    relocate 'org.slf4j', 'restfulcraft.mod.slf4j'
+    relocate 'spark', 'restfulcraft.mod.spark'
+}
+reobf {
+    shadowJar { }
+}
+
+artifacts {
+    archives shadowJar
+}
 def reobfFile = file("$buildDir/reobfJar/output.jar")
 def reobfArtifact = artifacts.add('default', reobfFile) {
+	tasks.build.dependsOn tasks.shadowJar
     type 'jar'
     builtBy 'reobfJar'
 }

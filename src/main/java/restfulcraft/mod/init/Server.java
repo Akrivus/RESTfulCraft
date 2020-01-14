@@ -26,7 +26,7 @@ public class Server {
 			Spark.internalServerError((req, res) -> { return CreateJSON.fromMap("error", "An error occured."); });
 			Spark.notFound((req, res) -> { return CreateJSON.fromMap("error", "Route not found."); });
 			Spark.before(Validate.AUTHORIZATION, Validate.JSON);
-			Spark.path("/api/v1/block/:mod/:dim", () -> {
+			Spark.path("/api/v1/:mod/:dim", () -> {
 				Spark.before("/:x/:y/:z", Validate.DIMENSION, Validate.BLOCK_POS);
 				Spark.get("/:x/:y/:z", BlockRouter.GET);
 				Spark.put("/:x/:y/:z", BlockRouter.PUT);
