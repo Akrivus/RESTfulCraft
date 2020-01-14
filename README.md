@@ -17,7 +17,7 @@ There are three configuration settings for RESTfulCraft.
 
 ### Getting a block
 Try the following command in Command Prompt:
-- `curl -X GET http://localhost:56552/api/v1/minecraft/overworld/0/4/0`
+- `curl -X GET http://localhost:56552/api/v1/block/minecraft/overworld/0/4/0`
 
 If there was no error, the following should appear.
 
@@ -47,7 +47,7 @@ Congrats! You've queried your first block using RESTfulCraft.
 
 ### Placing a block
 First, move out of the way because we'll be making a block right where you stand.
-- `curl -d '{"id":"minecraft:bedrock"}' -H "Content-Type: application/json" -X POST http://localhost:56552/api/v1/minecraft/overworld/0/4/0`
+- `curl -d '{"id":"minecraft:bedrock"}' -H "Content-Type: application/json" -X POST http://localhost:56552/api/v1/block/minecraft/overworld/0/4/0`
 
 Once again, assuming no error, the following response will be emitted:
 
@@ -72,7 +72,7 @@ Notice in the explanation how retrying the same command twice causes an error. T
 What we want is to _replace_ a block, which is what `PUT` is for.
 
 Try:
-- `curl -d '{"id":"minecraft:furnace"}' -H "Content-Type: application/json" -X PUT http://localhost:56552/api/v1/minecraft/overworld/0/4/0`
+- `curl -d '{"id":"minecraft:furnace"}' -H "Content-Type: application/json" -X PUT http://localhost:56552/api/v1/block/minecraft/overworld/0/4/0`
 
 Like before, expect:
 
@@ -90,11 +90,11 @@ You've replaced the bedrock block with a furnace.
 
 ### Updating a block
 You've got your furnace running, but _what if it is too bright for you?_ You could do something like:
-- `curl -d '{"id":"minecraft:furnace","properties":{"lit":false}}' -H "Content-Type: application/json" -X PUT http://localhost:56552/api/v1/minecraft/overworld/0/4/0`
+- `curl -d '{"id":"minecraft:furnace","properties":{"lit":false}}' -H "Content-Type: application/json" -X PUT http://localhost:56552/api/v1/block/minecraft/overworld/0/4/0`
 
 Right click your furnace, **it's still burning!**
 Let's do use a `PATCH` request to undo that. Try:
-- `curl -d '{"lit":true}' -H "Content-Type: application/json" -X PATCH http://localhost:56552/api/v1/minecraft/overworld/0/4/0`
+- `curl -d '{"lit":true}' -H "Content-Type: application/json" -X PATCH http://localhost:56552/api/v1/block/minecraft/overworld/0/4/0`
 
 Notice how much shorter this command is, that's because it doesn't affect the block, just the state's properties. It's something called a _shorthand_, think of it like a shortcut for your hands when you type.
 
@@ -104,7 +104,7 @@ No review necessary here, at this point we're admiring the simplicity of REST by
 Okay, let's wrap up this tutorial. We learned earlier that `PUT` requests allow you to "erase" blocks, but `DELETE` requests exist as a way to gracefully destroy blocks (still dangerous, will point it out below).
 
 Give this command a try:
-- `curl -X DELETE http://localhost:56552/api/v1/minecraft/overworld/0/4/0`
+- `curl -X DELETE http://localhost:56552/api/v1/block/minecraft/overworld/0/4/0`
 
 The furnace broke and dropped itself, however, it's inventory was erased (this is what I was pointing out.)
 
