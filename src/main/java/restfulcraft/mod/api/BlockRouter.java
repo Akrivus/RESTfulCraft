@@ -38,9 +38,11 @@ public class BlockRouter {
    			properties.add(property.getName(), value);
    		}
    		json.add("properties", properties);
-   		// we need to ask the chunk for the tile entity because the world withholds it if we're on a separate thread (which we are)
+   		// we need to ask the chunk for the tile entity because the world withholds it
+   		// if we're on a separate thread (which we are)
    		TileEntity tileEntity = conn.world.getChunkAt(conn.pos).getTileEntity(conn.pos);
-   		// reformatting "TileEntity" because depending on the configs it should be "tile_entity" or "tileEntity"
+   		// reformatting "TileEntity" because depending on the configs
+   		// it should be "tile_entity" or "tileEntity"
    		json.add(CreateJSON.reformat("TileEntity"), tileEntity == null ? null : CreateJSON.fromNBT(tileEntity.serializeNBT()));
    		ListNBT entities = new ListNBT();
 		List<Entity> inAABB = conn.world.getEntitiesWithinAABB(Entity.class, new AxisAlignedBB(conn.pos, conn.pos.add(1, 2, 1)));
