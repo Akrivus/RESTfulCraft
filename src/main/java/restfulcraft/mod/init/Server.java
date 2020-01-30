@@ -6,6 +6,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import restfulcraft.mod.api.BlockRouter;
+import restfulcraft.mod.api.CommandRouter;
 import restfulcraft.mod.http.CreateJSON;
 import restfulcraft.mod.http.Validate;
 import spark.Spark;
@@ -26,13 +27,24 @@ public class Server {
 			Spark.internalServerError((req, res) -> { return CreateJSON.fromMap("error", "An error occured."); });
 			Spark.notFound((req, res) -> { return CreateJSON.fromMap("error", "Route not found."); });
 			Spark.before(Validate.AUTHORIZATION, Validate.JSON);
-			Spark.path("/api/v1/:mod/:dim", () -> {
-				Spark.before("/:x/:y/:z", Validate.DIMENSION, Validate.BLOCK_POS);
-				Spark.get("/:x/:y/:z", BlockRouter.GET);
-				Spark.put("/:x/:y/:z", BlockRouter.PUT);
-				Spark.post("/:x/:y/:z", BlockRouter.POST);
-				Spark.patch("/:x/:y/:z", BlockRouter.PATCH);
-				Spark.delete("/:x/:y/:z", BlockRouter.DELETE);
+			Spark.path("/api/v1", () -> {
+				Spark.path("/:mod/:dim", () -> {
+					Spark.before("/:x/:y/:z", Validate.DIMENSION, Validate.BLOCK_POS);
+					Spark.get("/:x/:y/:z", BlockRouter.GET);
+					Spark.put("/:x/:y/:z", BlockRouter.PUT);
+					Spark.post("/:x/:y/:z", BlockRouter.POST);
+					Spark.patch("/:x/:y/:z", BlockRouter.PATCH);
+					Spark.delete("/:x/:y/:z", BlockRouter.DELETE);
+					Spark.trace("/:x/:y/:z", BlockRouter.TRACE);
+				});
+				Spark.path("/command", () -> {
+					Spark.get("/:name", CommandRouter.GET);
+					Spark.put("/:name", CommandRouter.PUT);
+					Spark.post("/:name", CommandRouter.POST);
+					Spark.patch("/:name", CommandRouter.PATCH);
+					Spark.delete("/:name", CommandRouter.DELETE);
+					Spark.get("/", CommandRouter.INDEX);
+				});
 			});
 			Spark.afterAfter((req, res) -> {
 				RESTfulCraft.LOGGER.info("{} - {} {} {}", req.ip(), res.status(), req.requestMethod(), req.uri());

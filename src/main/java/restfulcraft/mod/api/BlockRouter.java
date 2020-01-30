@@ -81,4 +81,10 @@ public class BlockRouter {
 			return CreateJSON.fromMap("broken", conn.world.destroyBlock(conn.pos, true));
 		}
 	};
+	/**
+	 * TRACE request; requires a callback location to work.
+	 */
+	public static final Route TRACE = (req, res) -> {
+		return Spark.halt(501, CreateJSON.fromMap("error", "Function not implemented."));
+	};
 }
