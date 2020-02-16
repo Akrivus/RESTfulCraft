@@ -6,7 +6,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import restfulcraft.mod.api.BlockRouter;
-import restfulcraft.mod.api.CommandRouter;
 import restfulcraft.mod.http.CreateJSON;
 import restfulcraft.mod.http.Validate;
 import spark.Spark;
@@ -35,15 +34,6 @@ public class Server {
 					Spark.post("/:x/:y/:z", BlockRouter.POST);
 					Spark.patch("/:x/:y/:z", BlockRouter.PATCH);
 					Spark.delete("/:x/:y/:z", BlockRouter.DELETE);
-					Spark.trace("/:x/:y/:z", BlockRouter.TRACE);
-				});
-				Spark.path("/command", () -> {
-					Spark.get("/:name", CommandRouter.GET);
-					Spark.put("/:name", CommandRouter.PUT);
-					Spark.post("/:name", CommandRouter.POST);
-					Spark.patch("/:name", CommandRouter.PATCH);
-					Spark.delete("/:name", CommandRouter.DELETE);
-					Spark.get("/", CommandRouter.INDEX);
 				});
 			});
 			Spark.afterAfter((req, res) -> {
