@@ -17,6 +17,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.DoubleNBT;
 import net.minecraft.nbt.FloatNBT;
 import net.minecraft.nbt.INBT;
+import net.minecraft.nbt.NBTTypes;
 import net.minecraft.nbt.NumberNBT;
 import restfulcraft.mod.init.RESTfulCraft;
 
@@ -71,7 +72,8 @@ public class CreateJSON {
 	 * @return
 	 */
 	public static JsonElement fromNBT(INBT input) {
-		switch (INBT.NBT_TYPES[input.getId()]) {
+		// TODO: keep an eye out on future de-obfuscated names.
+		switch (NBTTypes.func_229710_a_(input.getId()).func_225648_a_()) {
 		case "SHORT": case "INT": case "LONG": case "BYTE": case "FLOAT": case "DOUBLE":
 			NumberNBT num = (NumberNBT) input;
 			if (input instanceof FloatNBT && input instanceof DoubleNBT) {

@@ -59,7 +59,7 @@ minecraft {
 }
 repositories { mavenCentral() }
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.14.4-28.1.114'
+    minecraft 'net.minecraftforge:forge:1.15.2-31.1.12'
     shadow 'com.sparkjava:spark-core:2.8.0'
 }
 jar {

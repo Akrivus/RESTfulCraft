@@ -4,9 +4,11 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import net.minecraft.block.Block;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -16,6 +18,7 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.config.ModConfig.ModConfigEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.event.server.FMLServerStoppedEvent;
+import restfulcraft.mod.block.RequestBlock;
 
 @Mod("restfulcraft")
 public class RESTfulCraft {
@@ -36,6 +39,16 @@ public class RESTfulCraft {
     	} else {
     		e.getPlayer().sendMessage(new TranslationTextComponent("restfulcraft.commands.server.offline"));
     	}
+    }
+    @SubscribeEvent
+    public void onBlockRegistry(RegistryEvent.Register<Block> e) {
+    	e.getRegistry().registerAll(
+    		Blocks.GET = new RequestBlock(RequestBlock.RequestMethod.GET).setRegistryName("restfulcraft", "get"),	
+    		Blocks.PUT = new RequestBlock(RequestBlock.RequestMethod.PUT).setRegistryName("restfulcraft", "put"),	
+    		Blocks.POST = new RequestBlock(RequestBlock.RequestMethod.POST).setRegistryName("restfulcraft", "post"),	
+    		Blocks.PATCH = new RequestBlock(RequestBlock.RequestMethod.PATCH).setRegistryName("restfulcraft", "patch"),	
+    		Blocks.DELETE = new RequestBlock(RequestBlock.RequestMethod.DELETE).setRegistryName("restfulcraft", "delete")
+    	);
     }
     @SubscribeEvent
     public void onServerStarting(FMLServerStartingEvent e) {
@@ -68,5 +81,12 @@ public class RESTfulCraft {
         	RESTfulCraft.formatSnakeCase = Config.INSTANCE.formatSnakeCase.get();
         	RESTfulCraft.port = Config.INSTANCE.port.get();
     	}
+    }
+    public static class Blocks {
+    	public static Block GET;
+    	public static Block PUT;
+    	public static Block POST;
+    	public static Block PATCH;
+    	public static Block DELETE;
     }
 }

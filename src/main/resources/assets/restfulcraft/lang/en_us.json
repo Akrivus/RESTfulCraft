@@ -4,5 +4,10 @@
     "restfulcraft.commands.route.success": "<RESTfulCraft> §eRouted§f @ §7[%s]",
     "restfulcraft.config.authKey": "Authentication key:",
     "restfulcraft.config.formatSnakeCase": "Format as snake_case?",
-    "restfulcraft.config.port": "Server port:"
+    "restfulcraft.config.port": "Server port:",
+    "block.restfulcraft.get": "GET",
+    "block.restfulcraft.put": "PUT",
+    "block.restfulcraft.post": "POST",
+    "block.restfulcraft.patch": "PATCH",
+    "block.restfulcraft.delete": "DELETE"
 }
