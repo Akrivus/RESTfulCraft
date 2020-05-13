@@ -59,16 +59,16 @@ minecraft {
 }
 repositories { mavenCentral() }
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.15.2-31.1.12'
+    minecraft 'net.minecraftforge:forge:1.15.2-31.1.87'
     shadow 'com.sparkjava:spark-core:2.8.0'
 }
 jar {
     manifest {
         attributes([
-            "Implementation-Title": project.name, "Implementation-Vendor": "Akrivus",
+            "Implementation-Title": project.name, "Implementation-Vendor": "Owen Adrian",
             "Implementation-Version": "${version}",
             "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-            "Specification-Title": "RESTfulCraft", "Specification-Vendor": "Akrivus",
+            "Specification-Title": "RESTfulCraft", "Specification-Vendor": "Owen Adrian",
             "Specification-Version": "1"
         ])
     }

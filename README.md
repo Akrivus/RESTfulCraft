@@ -1,6 +1,7 @@
 ![RESTfulCraft](./images/logo.png)
 
-Introducing software development concepts to Minecraft by turning worlds into a RESTful web service that allows players to create, view, update, and destroy blocks with code or tools such as Postman or cURL.
+Introducing RESTful APIs to Minecarft by creating a web service for the player's world, allowing block CRUD and command dispatch.
+This mod allows players to create, view, update, and destroy blocks with code or tools such as Postman or cURL.
 
 ## Configuration
 There are three configuration settings for RESTfulCraft.
