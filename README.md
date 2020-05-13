@@ -1,6 +1,6 @@
-![RESTfulCraft](./images/logo.png)
+# RESfulCraft
 
-Introducing RESTful APIs to Minecarft by creating a web service for the player's world, allowing block CRUD and command dispatch.
+Introducing RESTful APIs to Minecraft by creating a web service for the player's world, allowing block CRUD and command dispatch.
 This mod allows players to create, view, update, and destroy blocks with code or tools such as Postman or cURL.
 
 ## Configuration
