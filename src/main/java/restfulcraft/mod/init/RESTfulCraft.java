@@ -7,18 +7,22 @@ import org.apache.logging.log4j.Logger;
 import net.minecraft.block.Block;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent;
+import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
+import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.config.ModConfig.ModConfigEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.event.server.FMLServerStoppedEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
 import restfulcraft.mod.block.RequestBlock;
+import restfulcraft.mod.block.RequestBlock.RequestMethod;
 
 @Mod("restfulcraft")
 public class RESTfulCraft {
@@ -30,33 +34,24 @@ public class RESTfulCraft {
 
     public RESTfulCraft() {
     	ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.SPEC);
-        MinecraftForge.EVENT_BUS.register(this);
+    	IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
+        Blocks.REGISTRY.register(bus);
     }
     @SubscribeEvent
     public void onPlayerLoggedIn(PlayerLoggedInEvent e) {
-    	if (server.isOnline()) {
+    	if (RESTfulCraft.server.isOnline()) {
     		e.getPlayer().sendMessage(new TranslationTextComponent("restfulcraft.commands.server.online", Server.port));
     	} else {
     		e.getPlayer().sendMessage(new TranslationTextComponent("restfulcraft.commands.server.offline"));
     	}
     }
     @SubscribeEvent
-    public void onBlockRegistry(RegistryEvent.Register<Block> e) {
-    	e.getRegistry().registerAll(
-    		Blocks.GET = new RequestBlock(RequestBlock.RequestMethod.GET).setRegistryName("restfulcraft", "get"),	
-    		Blocks.PUT = new RequestBlock(RequestBlock.RequestMethod.PUT).setRegistryName("restfulcraft", "put"),	
-    		Blocks.POST = new RequestBlock(RequestBlock.RequestMethod.POST).setRegistryName("restfulcraft", "post"),	
-    		Blocks.PATCH = new RequestBlock(RequestBlock.RequestMethod.PATCH).setRegistryName("restfulcraft", "patch"),	
-    		Blocks.DELETE = new RequestBlock(RequestBlock.RequestMethod.DELETE).setRegistryName("restfulcraft", "delete")
-    	);
-    }
-    @SubscribeEvent
     public void onServerStarting(FMLServerStartingEvent e) {
-		server = new Server(e.getServer());
+		RESTfulCraft.server = new Server(e.getServer());
     }
     @SubscribeEvent
     public void onServerStopped(FMLServerStoppedEvent e) {
-		server.stop();
+    	RESTfulCraft.server.stop();
 	}
     @EventBusSubscriber
     public static class Config {
@@ -72,7 +67,7 @@ public class RESTfulCraft {
     		builder.push("server");
     		this.authKey = builder.translation("restfulcraft.config.authKey").define("authKey", "");
     		this.formatSnakeCase = builder.translation("restfulcraft.config.formatSnakeCase").define("formatSnakeCase", false);
-    		this.port = builder.translation("restfulcraft.config.port").defineInRange("port", 56552, 1, 65535);
+    		this.port = builder.translation("restfulcraft.config.port").defineInRange("port", 25595, 1, 65535);
     		builder.pop();
     	}
         @SubscribeEvent
@@ -83,10 +78,11 @@ public class RESTfulCraft {
     	}
     }
     public static class Blocks {
-    	public static Block GET;
-    	public static Block PUT;
-    	public static Block POST;
-    	public static Block PATCH;
-    	public static Block DELETE;
+    	public static final DeferredRegister<Block> REGISTRY = new DeferredRegister<Block>(ForgeRegistries.BLOCKS, "restfulcraft");
+    	public static final RegistryObject<RequestBlock> POST = REGISTRY.register("post_request", () -> new RequestBlock(RequestMethod.POST));
+    	public static final RegistryObject<RequestBlock> GET = REGISTRY.register("get_request", () -> new RequestBlock(RequestMethod.GET));
+    	public static final RegistryObject<RequestBlock> PATCH = REGISTRY.register("patch_request", () -> new RequestBlock(RequestMethod.PATCH));
+    	public static final RegistryObject<RequestBlock> PUT = REGISTRY.register("put_request", () -> new RequestBlock(RequestMethod.PUT));
+    	public static final RegistryObject<RequestBlock> DELETE = REGISTRY.register("delete_request", () -> new RequestBlock(RequestMethod.DELETE));
     }
 }

@@ -1,6 +1,10 @@
 package restfulcraft.mod.http;
 
+import java.util.Base64;
+import java.util.UUID;
+
 import com.google.gson.JsonParseException;
+import com.mojang.authlib.GameProfile;
 
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -11,9 +15,26 @@ import spark.Filter;
 import spark.Spark;
 
 public class Validate {
-	public static final Filter AUTHORIZATION = (req, res) -> {
+	public static final Filter V1_AUTHORIZATION = (req, res) -> {
 		if (RESTfulCraft.authKey.length() > 0 && !req.headers("Authorization").equals(RESTfulCraft.authKey)) {
 			Spark.halt(401, CreateJSON.fromMap("error", "Authorization key invalid."));
+		}
+	};
+	public static final Filter V2_AUTHORIZATION = (req, res) -> {
+		byte[] auth = Base64.getDecoder().decode(req.headers("Authorization").substring(5, req.headers("Authorization").length()));
+		String[] credentials = new String(auth).split(":");
+		if (credentials.length == 2) {
+			UUID uuid = UUID.fromString(credentials[1]);
+			if (RESTfulCraft.authKey.equals(credentials[0])) {
+				boolean admin = RESTfulCraft.server.getWorld(DimensionType.OVERWORLD).getServer().getPlayerList().canSendCommands(new GameProfile(uuid, null));
+				if (!admin) {
+					Spark.halt(403, CreateJSON.fromMap("error", "Access denied."));
+				}
+			} else {
+				Spark.halt(401, CreateJSON.fromMap("error", "Incorrect authorization key."));
+			}
+		} else {
+			Spark.halt(401, CreateJSON.fromMap("errors", "Malformed or missing authorization header."));
 		}
 	};
 	public static final Filter JSON = (req, res) -> {

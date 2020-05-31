@@ -14,7 +14,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = new Date().format('1.1.yyMMdd')
+version = new Date().format('2.0.yyMMdd')
 archivesBaseName = "RESTfulCraft"
 group = "restfulcraft.mod"
 
